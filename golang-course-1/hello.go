@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"example.com/hello/datafile"
 )
 
 func main() {
@@ -87,24 +89,19 @@ func main() {
 		fmt.Println(value)
 	}
 
-	file, err := os.Open("data.txt")
+	numbers, err := datafile.GetFloats("data.txt")
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	scanner := bufio.NewScanner(file)
+	var sum float64 = 0
 
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+	for _, number := range numbers {
+		sum += number
 	}
 
-	err = file.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if scanner.Err() != nil {
-		log.Fatal(scanner.Err())
-	}
+	count := float64(len(numbers))
+	fmt.Print(sum / count)
 
 }
