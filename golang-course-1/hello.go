@@ -104,4 +104,14 @@ func main() {
 	count := float64(len(numbers))
 	fmt.Print(sum / count)
 
+	arrayLiters := [5]string{"a", "b", "c", "d", "e"}
+
+	slice := []string{
+		"q",
+		"w",
+	}
+	slice2 := arrayLiters[2:]
+
+	slice = append(slice, "e")
+	fmt.Println(slice, slice2)
 }
