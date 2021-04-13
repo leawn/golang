@@ -1,5 +1,42 @@
 package main
 
+import "fmt"
+
+type Auto struct {
+	Name        string
+	Rate        float64
+	New         bool
+	HomeAddress Address
+}
+
+type Address struct {
+	Street   string
+	City     string
+	Building string
+}
+
+func printInfo(a Auto) {
+	fmt.Println("Name: ", a.Name)
+	fmt.Println("Rate: ", a.Rate)
+	fmt.Println("New: ", a.New)
+	fmt.Println("Address: ", a.HomeAddress)
+}
+
+func defaultAuto(name string) Auto {
+	var a Auto
+	a.Name = name
+	a.Rate = 10.00
+	a.New = true
+	a.HomeAddress.City = "Berlin"
+	a.HomeAddress.Street = "Alexanderplatz"
+	a.HomeAddress.Building = "Eins"
+	return a
+}
+
+func applyDiscount(a *Auto) {
+	a.Rate = 5.99
+}
+
 func main() {
 	// fmt.Print("Wie alt bist du? ")
 	// reader := bufio.NewReader(os.Stdin)
@@ -119,13 +156,23 @@ func main() {
 	// slice = append(slice, "e")
 	// fmt.Println(slice, slice2)
 
-	var auto struct {
-		name string
-		rate float64
-		new  bool
+	// auto.name = "Porsche 911"
+	// auto.rate = 9.11
+	// auto.new = true
+
+	// var porsche auto
+	// porsche.name = "Porsche 911"
+	// var bmw auto
+	// bmw.name = "BMW M5"
+
+	address := Address{
+		Street:   "Brandenburger Tor",
+		City:     "Berlin",
+		Building: "Zwei",
 	}
 
-	auto.name = "Porsche 911"
-	auto.rate = 9.11
-	auto.new = true
+	porsche := defaultAuto("Porsche 911")
+	porsche.HomeAddress = address
+	applyDiscount(&porsche)
+	printInfo(porsche)
 }
