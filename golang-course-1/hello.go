@@ -1,11 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"log"
-
-	"example.com/hello/calendar"
-)
+import "example.com/hello/gadget"
 
 // type Auto struct {
 // 	Name        string
@@ -41,6 +36,25 @@ import (
 // func applyDiscount(a *Auto) {
 // 	a.Rate = 5.99
 // }
+
+type Player interface {
+	Play(string)
+	Stop()
+}
+
+func playlist(device Player, song []string) {
+	for _, song := range song {
+		device.Play(song)
+	}
+	device.Stop()
+}
+
+func TryOut(player Player) {
+	player.Play("Blood on the leaves")
+	player.Stop()
+	recorder := player.(*gadget.TapeRecorder)
+	recorder.Record()
+}
 
 func main() {
 	// fmt.Print("Wie alt bist du? ")
@@ -181,11 +195,20 @@ func main() {
 	// applyDiscount(&porsche)
 	// printInfo(porsche)
 
-	date := calendar.Date{}
-	err := date.SetYear(3100)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(date)
+	// date := calendar.Date{}
+	// err := date.SetYear(3100)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Println(date)
+
+	var player Player = &gadget.TapePlayer{}
+	mixtape := []string{"SICKO MODE", "WAKE UP", "STARGAZING"}
+	playlist(player, mixtape)
+
+	player = &gadget.TapeRecorder{}
+	playlist(player, mixtape)
+
+	TryOut(&gadget.TapeRecorder{})
 
 }
