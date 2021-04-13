@@ -1,6 +1,35 @@
 package main
 
-import "example.com/hello/gadget"
+import (
+	"fmt"
+	"io/ioutil"
+	"log"
+	"path/filepath"
+)
+
+func scanDir(path string) error {
+	fmt.Println(path)
+
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		filePath := filepath.Join(path, file.Name())
+		if file.IsDir() {
+			err := scanDir(filePath)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println("Dir: ", file.Name())
+		} else {
+			fmt.Println(filePath)
+		}
+	}
+
+	return nil
+}
 
 // type Auto struct {
 // 	Name        string
@@ -37,24 +66,24 @@ import "example.com/hello/gadget"
 // 	a.Rate = 5.99
 // }
 
-type Player interface {
-	Play(string)
-	Stop()
-}
+// type Player interface {
+// 	Play(string)
+// 	Stop()
+// }
 
-func playlist(device Player, song []string) {
-	for _, song := range song {
-		device.Play(song)
-	}
-	device.Stop()
-}
+// func playlist(device Player, song []string) {
+// 	for _, song := range song {
+// 		device.Play(song)
+// 	}
+// 	device.Stop()
+// }
 
-func TryOut(player Player) {
-	player.Play("Blood on the leaves")
-	player.Stop()
-	recorder := player.(*gadget.TapeRecorder)
-	recorder.Record()
-}
+// func TryOut(player Player) {
+// 	player.Play("Blood on the leaves")
+// 	player.Stop()
+// 	recorder := player.(*gadget.TapeRecorder)
+// 	recorder.Record()
+// }
 
 func main() {
 	// fmt.Print("Wie alt bist du? ")
@@ -202,13 +231,17 @@ func main() {
 	// }
 	// fmt.Println(date)
 
-	var player Player = &gadget.TapePlayer{}
-	mixtape := []string{"SICKO MODE", "WAKE UP", "STARGAZING"}
-	playlist(player, mixtape)
+	// var player Player = &gadget.TapePlayer{}
+	// mixtape := []string{"SICKO MODE", "WAKE UP", "STARGAZING"}
+	// playlist(player, mixtape)
 
-	player = &gadget.TapeRecorder{}
-	playlist(player, mixtape)
+	// player = &gadget.TapeRecorder{}
+	// playlist(player, mixtape)
 
-	TryOut(&gadget.TapeRecorder{})
+	// TryOut(&gadget.TapeRecorder{})
 
+	err := scanDir("catalog")
+	if err != nil {
+		log.Fatal(err)
+	}
 }
