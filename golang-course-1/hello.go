@@ -1,41 +1,46 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
 
-type Auto struct {
-	Name        string
-	Rate        float64
-	New         bool
-	HomeAddress Address
-}
+	"example.com/hello/calendar"
+)
 
-type Address struct {
-	Street   string
-	City     string
-	Building string
-}
+// type Auto struct {
+// 	Name        string
+// 	Rate        float64
+// 	New         bool
+// 	HomeAddress Address
+// }
 
-func printInfo(a Auto) {
-	fmt.Println("Name: ", a.Name)
-	fmt.Println("Rate: ", a.Rate)
-	fmt.Println("New: ", a.New)
-	fmt.Println("Address: ", a.HomeAddress)
-}
+// type Address struct {
+// 	Street   string
+// 	City     string
+// 	Building string
+// }
 
-func defaultAuto(name string) Auto {
-	var a Auto
-	a.Name = name
-	a.Rate = 10.00
-	a.New = true
-	a.HomeAddress.City = "Berlin"
-	a.HomeAddress.Street = "Alexanderplatz"
-	a.HomeAddress.Building = "Eins"
-	return a
-}
+// func printInfo(a Auto) {
+// 	fmt.Println("Name: ", a.Name)
+// 	fmt.Println("Rate: ", a.Rate)
+// 	fmt.Println("New: ", a.New)
+// 	fmt.Println("Address: ", a.HomeAddress)
+// }
 
-func applyDiscount(a *Auto) {
-	a.Rate = 5.99
-}
+// func defaultAuto(name string) Auto {
+// 	var a Auto
+// 	a.Name = name
+// 	a.Rate = 10.00
+// 	a.New = true
+// 	a.HomeAddress.City = "Berlin"
+// 	a.HomeAddress.Street = "Alexanderplatz"
+// 	a.HomeAddress.Building = "Eins"
+// 	return a
+// }
+
+// func applyDiscount(a *Auto) {
+// 	a.Rate = 5.99
+// }
 
 func main() {
 	// fmt.Print("Wie alt bist du? ")
@@ -165,14 +170,22 @@ func main() {
 	// var bmw auto
 	// bmw.name = "BMW M5"
 
-	address := Address{
-		Street:   "Brandenburger Tor",
-		City:     "Berlin",
-		Building: "Zwei",
-	}
+	// address := Address{
+	// 	Street:   "Brandenburger Tor",
+	// 	City:     "Berlin",
+	// 	Building: "Zwei",
+	// }
 
-	porsche := defaultAuto("Porsche 911")
-	porsche.HomeAddress = address
-	applyDiscount(&porsche)
-	printInfo(porsche)
+	// porsche := defaultAuto("Porsche 911")
+	// porsche.HomeAddress = address
+	// applyDiscount(&porsche)
+	// printInfo(porsche)
+
+	date := calendar.Date{}
+	err := date.SetYear(3100)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(date)
+
 }
