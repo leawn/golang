@@ -3,32 +3,39 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"path/filepath"
 )
 
-func scanDir(path string) error {
+func reportPanic() {
+	p := recover()
+	if p == nil {
+		return
+	}
+	err, ok := p.(error)
+	if ok {
+		fmt.Println(err)
+	} else {
+		panic(p)
+	}
+}
+
+func scanDir(path string) {
 	fmt.Println(path)
 
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	for _, file := range files {
 		filePath := filepath.Join(path, file.Name())
 		if file.IsDir() {
-			err := scanDir(filePath)
-			if err != nil {
-				log.Fatal(err)
-			}
+			scanDir(filePath)
 			fmt.Println("Dir: ", file.Name())
 		} else {
 			fmt.Println(filePath)
 		}
 	}
-
-	return nil
 }
 
 // type Auto struct {
@@ -240,8 +247,6 @@ func main() {
 
 	// TryOut(&gadget.TapeRecorder{})
 
-	err := scanDir("catalog")
-	if err != nil {
-		log.Fatal(err)
-	}
+	defer reportPanic()
+	scanDir("catalog")
 }
