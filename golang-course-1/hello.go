@@ -2,15 +2,66 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"html/template"
 	"log"
 	"net/http"
+	"os"
+
+	"example.com/hello/datafile"
 )
 
-type Page struct {
-	URL  string
-	Size int
+type Guestbook struct {
+	SignatureCount int
+	Signature      []string
 }
+
+func check(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func newHandler(writer http.ResponseWriter, request *http.Request) {
+	html, err := template.ParseFiles("new.html")
+	check(err)
+	err = html.Execute(writer, nil)
+	check(err)
+}
+
+func createHandler(writer http.ResponseWriter, request *http.Request) {
+	signature := request.FormValue("signature")
+
+	options := os.O_WRONLY | os.O_APPEND | os.O_CREATE
+	file, err := os.OpenFile("signature.txt", options, os.FileMode(0600))
+	check(err)
+	_, err = fmt.Fprintln(file, signature)
+	check(err)
+	err = file.Close()
+	check(err)
+	http.Redirect(writer, request, "/guestbook", http.StatusFound)
+}
+
+func viewHandler(writer http.ResponseWriter, request *http.Request) {
+	signature, err := datafile.GetStrings("signatures.txt")
+	check(err)
+	html, err := template.ParseFiles("view.html")
+	check(err)
+	// placeholder := []byte("Type anything down here")
+	// _, err := writer.Write(placeholder)
+
+	guestbook := Guestbook{
+		SignatureCount: len(signature),
+		Signature:      signature,
+	}
+
+	err = html.Execute(writer, guestbook)
+	check(err)
+}
+
+// type Page struct {
+// 	URL  string
+// 	Size int
+// }
 
 // func reportPanic() {
 // 	p := recover()
@@ -261,44 +312,50 @@ func main() {
 
 	// qwe := <-channel1
 
-	pages := make(chan Page)
-	urls := []string{
-		"https://golang.org/",
-		"https://golang.org/doc",
-		"https://example.com/",
-	}
+	// pages := make(chan Page)
+	// urls := []string{
+	// 	"https://golang.org/",
+	// 	"https://golang.org/doc",
+	// 	"https://example.com/",
+	// }
 
-	for _, url := range urls {
-		go responseSize(url, pages)
-	}
+	// for _, url := range urls {
+	// 	go responseSize(url, pages)
+	// }
 
-	for i := 0; i < len(urls); i++ {
-		page := <-pages
-		fmt.Println(page.URL, " ", page.Size)
-	}
+	// for i := 0; i < len(urls); i++ {
+	// 	page := <-pages
+	// 	fmt.Println(page.URL, " ", page.Size)
+	// }
 
 	// go responseSize("https://golang.org/", sizes)
 	// go responseSize("https://golang.org/doc", sizes)
 
 	// fmt.Println(<-sizes)
 	// fmt.Println(<-sizes)
+
+	http.HandleFunc("/guestbook", viewHandler)
+	http.HandleFunc("/guestbook/new", newHandler)
+	http.HandleFunc("/guestbook/create", createHandler)
+	err := http.ListenAndServe("localhost:8080", nil)
+	log.Fatal(err)
 }
 
-func responseSize(url string, channel chan Page) {
-	fmt.Println("Getting ", url)
+// func responseSize(url string, channel chan Page) {
+// 	fmt.Println("Getting ", url)
 
-	response, err := http.Get(url)
+// 	response, err := http.Get(url)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+// 	defer response.Body.Close()
+// 	body, err := ioutil.ReadAll(response.Body)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	channel <- Page{URL: url, Size: len(body)}
-}
+// 	channel <- Page{URL: url, Size: len(body)}
+// }
