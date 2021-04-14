@@ -3,40 +3,46 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"path/filepath"
+	"log"
+	"net/http"
 )
 
-func reportPanic() {
-	p := recover()
-	if p == nil {
-		return
-	}
-	err, ok := p.(error)
-	if ok {
-		fmt.Println(err)
-	} else {
-		panic(p)
-	}
+type Page struct {
+	URL  string
+	Size int
 }
 
-func scanDir(path string) {
-	fmt.Println(path)
+// func reportPanic() {
+// 	p := recover()
+// 	if p == nil {
+// 		return
+// 	}
+// 	err, ok := p.(error)
+// 	if ok {
+// 		fmt.Println(err)
+// 	} else {
+// 		panic(p)
+// 	}
+// }
 
-	files, err := ioutil.ReadDir(path)
-	if err != nil {
-		panic(err)
-	}
+// func scanDir(path string) {
+// 	fmt.Println(path)
 
-	for _, file := range files {
-		filePath := filepath.Join(path, file.Name())
-		if file.IsDir() {
-			scanDir(filePath)
-			fmt.Println("Dir: ", file.Name())
-		} else {
-			fmt.Println(filePath)
-		}
-	}
-}
+// 	files, err := ioutil.ReadDir(path)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	for _, file := range files {
+// 		filePath := filepath.Join(path, file.Name())
+// 		if file.IsDir() {
+// 			scanDir(filePath)
+// 			fmt.Println("Dir: ", file.Name())
+// 		} else {
+// 			fmt.Println(filePath)
+// 		}
+// 	}
+// }
 
 // type Auto struct {
 // 	Name        string
@@ -247,6 +253,52 @@ func main() {
 
 	// TryOut(&gadget.TapeRecorder{})
 
-	defer reportPanic()
-	scanDir("catalog")
+	// defer reportPanic()
+	// scanDir("catalog")
+
+	// channel1 := make(chan float64)
+	// channel1 <- 3.14
+
+	// qwe := <-channel1
+
+	pages := make(chan Page)
+	urls := []string{
+		"https://golang.org/",
+		"https://golang.org/doc",
+		"https://example.com/",
+	}
+
+	for _, url := range urls {
+		go responseSize(url, pages)
+	}
+
+	for i := 0; i < len(urls); i++ {
+		page := <-pages
+		fmt.Println(page.URL, " ", page.Size)
+	}
+
+	// go responseSize("https://golang.org/", sizes)
+	// go responseSize("https://golang.org/doc", sizes)
+
+	// fmt.Println(<-sizes)
+	// fmt.Println(<-sizes)
+}
+
+func responseSize(url string, channel chan Page) {
+	fmt.Println("Getting ", url)
+
+	response, err := http.Get(url)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	channel <- Page{URL: url, Size: len(body)}
 }
