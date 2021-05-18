@@ -25,3 +25,5 @@ func main() {
 	s1 = append(s1[:4], 200)
 	fmt.Println(s1)
 }
+
+// git check
